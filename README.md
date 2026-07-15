@@ -1,141 +1,92 @@
-# 💧 مياه واحة عمان - Oman Oasis Water
+# 💧 مياه واحة قطر - Water Oman
 
-منصة تجارة إلكترونية متكاملة لبيع مياه الشرب من سلطنة عمان.
+منصة تجارة إلكترونية متكاملة لبيع مياه الشرب مع لوحة تحكم إدارية، وتتبع زوار، وإشعارات فورية.
 
 ## 🚀 المميزات
 
-### صفحات العميل
-- 🏠 الصفحة الرئيسية مع عرض المنتجات
-- 📦 صفحة بيانات التوصيل
-- 💳 صفحة الدفع
-- 🔐 صفحة التحقق (OTP)
-
-### لوحة تحكم الإدارة
-- 📊 إحصائيات فورية (الزوار، الطلبات، الدول)
-- 👥 متابعة الزوار بالوقت الفعلي (تحديث كل ثانية)
-- 🔔 نظام إشعارات صوتية للأدمن
-- 📦 إدارة المنتجات (CRUD)
-- 🚫 نظام حظر المستخدمين
-- 📱 إدارة الأجهزة المتصلة
+- واجهة عميل تعرض المنتجات وتدعم الصفحات: الرئيسية، التوصيل، الدفع، التحقق
+- لوحة تحكم إدارية للتتبع والإحصائيات وإدارة المنتجات والمحظورين
+- اتصال مباشر عبر Socket.IO للتحديثات اللحظية
+- إشعارات push وإشعارات صوتية للمدير
+- دعم قاعدة بيانات PostgreSQL (Neon)
 
 ## 🛠️ التقنيات المستخدمة
 
-### Backend
-- Node.js
-- Express.js
-- Socket.io (للتحديثات الفورية)
-- PostgreSQL (Neon)
-- bcryptjs (لتشفير كلمات المرور)
-- geoip-lite (لتحديد الدول)
+- Node.js + Express
+- Socket.IO
+- PostgreSQL / Neon
+- Firebase Admin SDK (لـ FCM)
+- HTML / CSS / JavaScript
 
-### Frontend
-- HTML5
-- CSS3
-- Vanilla JavaScript
-- Socket.io Client
+## 📦 هيكل المشروع
 
-## 📦 التثبيت
-
-### 1. استنساخ المشروع
-```bash
-git clone https://github.com/alwtnyaldm-glitch/wateroman.git
-cd wateroman
-```
-
-### 2. تثبيت الحزم
-```bash
-cd backend
-npm install
-```
-
-### 3. إعداد قاعدة البيانات
-قم بإنشاء ملف `.env` في مجلد backend:
-```env
-DATABASE_URL=postgresql://user:password@host/database?sslmode=require
-PORT=3000
-ADMIN_DEFAULT_PASSWORD=admin123
-```
-
-### 4. تشغيل السيرفر
-```bash
-npm start
-```
-
-## 🔐 بيانات الدخول للوحة التحكم
-
-- **اسم المستخدم:** `admin`
-- **كلمة المرور:** `admin123`
-
-## 📁 هيكل المشروع
-
-```
+```text
 wateroman/
 ├── backend/
 │   ├── config/
-│   │   └── database.js
 │   ├── models/
-│   │   └── schema.js
 │   ├── routes/
-│   │   ├── admin.js
-│   │   ├── products.js
-│   │   └── visitors.js
 │   ├── server.js
 │   ├── package.json
 │   └── .env
 ├── frontend/
 │   ├── admin/
-│   │   ├── index.html
-│   │   ├── admin.js
-│   │   └── admin.css
 │   ├── pages/
-│   │   ├── delivery.html
-│   │   ├── payment.html
-│   │   └── verification.html
 │   ├── css/
-│   │   └── style.css
-│   ├── js/
-│   │   └── main.js
-│   └── index.html
+│   └── js/
+├── package.json
+├── railway.json
+├── backend/Procfile
 └── README.md
 ```
 
-## 🌐 الروابط
+## ⚙️ التشغيل على Railway
 
-- **الموقع:** http://localhost:3000
-- **لوحة التحكم:** http://localhost:3000/admin
-- **API:** http://localhost:3000/api
+هذا المشروع جاهز للنشر على Railway كخدمة واحدة، حيث سيكتشف Railway تلقائيًا:
 
-## 📊 قواعد البيانات
+- استخدام Node.js
+- تشغيل Backend من [backend/server.js](backend/server.js)
+- استخدام ملف [package.json](package.json) في الجذر
+- استخدام [railway.json](railway.json) للتهيئة
 
-### جدول المنتجات (products)
-| الحقل | النوع | الوصف |
-|-------|------|-------|
-| id | SERIAL | المعرف |
-| name_ar | VARCHAR | الاسم بالعربية |
-| name_en | VARCHAR | الاسم بالإنجليزية |
-| description | TEXT | الوصف |
-| price | DECIMAL | السعر |
-| image_url | VARCHAR | رابط الصورة |
-| category | VARCHAR | الفئة |
-| stock | INTEGER | المخزون |
+### ما الذي تحتاجه في Railway
 
-### جدول الزوار (visitors)
-| الحقل | النوع | الوصف |
-|-------|------|-------|
-| session_id | VARCHAR | معرف الجلسة |
-| ip_address | VARCHAR | عنوان IP |
-| country | VARCHAR | الدولة |
-| current_page | VARCHAR | الصفحة الحالية |
-| is_online | BOOLEAN | حالة الاتصال |
-| delivery_data | JSONB | بيانات التوصيل |
-| payment_data | JSONB | بيانات الدفع |
+أضف المتغيرات البيئية التالية في إعدادات المشروع:
 
-## 🔔 الإشعارات الصوتية
+```env
+ADMIN_DEFAULT_PASSWORD=admin123
+DATABASE_URL=postgresql://... 
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-fbsvc@adminqatar-d4192.iam.gserviceaccount.com
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n..."
+FIREBASE_PROJECT_ID=adminqatar-d4192
+NODE_ENV=production
+VAPID_PRIVATE_KEY=...
+VAPID_PUBLIC_KEY=...
+PORT=3000
+```
 
-- **👤 زائر جديد:** نغمة ترحيبية
-- **📝 نموذج التوصيل:** نغمة قصيرة
-- **💳 بيانات الدفع:** نغمة متوسطة
-- **🔐 رمز التحقق:** نغمة طويلة
+### ملاحظات مهمة
+
+- يجب أن يكون المشروع مرتبطًا بـ GitHub ثم ربط المستودع مع Railway.
+- Railway سيستخدم [railway.json](railway.json) تلقائيًا ويشغل المشروع عبر [package.json](package.json).
+- تطبيق الواجهة والـ API يعملان من نفس الخادم الخلفي، لذلك لا حاجة لخدمة منفصلة للـ frontend.
+
+## ▶️ التشغيل محليًا
+
+```bash
+cd backend
+npm install
+npm start
+```
+
+ثم افتح:
+- http://localhost:3000
+- http://localhost:3000/admin
+
+## 🔐 بيانات الدخول الافتراضية
+
+- اسم المستخدم: admin
+- كلمة المرور: admin123
 
 ## 📝 الرخصة
 

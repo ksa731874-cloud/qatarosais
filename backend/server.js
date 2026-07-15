@@ -1397,14 +1397,16 @@ app.get('/api/health', (req, res) => {
 
 // Start server
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '0.0.0.0';
 
 const startServer = async () => {
   try {
     // Run database migrations
     await runMigrations();
-    server.listen(PORT, () => {
+    server.listen(PORT, HOST, () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`🌐 Frontend: http://localhost:${PORT}`);
+      console.log(`🌐 LAN Access: http://${HOST === '0.0.0.0' ? 'YOUR_PC_IP' : HOST}:${PORT}`);
       console.log(`📊 API: http://localhost:${PORT}/api`);
     });
   } catch (error) {
