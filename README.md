@@ -51,7 +51,7 @@ wateroman/
 
 ### ما الذي تحتاجه في Railway
 
-أضف المتغيرات البيئية التالية في إعدادات المشروع:
+أضف المتغيرات البيئية التالية يدويًا في قسم Variables داخل Railway (بدلًا من الاعتماد على ملف .env المحلي):
 
 ```env
 ADMIN_DEFAULT_PASSWORD=admin123
@@ -70,6 +70,8 @@ PORT=3000
 - يجب أن يكون المشروع مرتبطًا بـ GitHub ثم ربط المستودع مع Railway.
 - Railway سيستخدم [railway.json](railway.json) تلقائيًا ويشغل المشروع عبر [package.json](package.json).
 - تطبيق الواجهة والـ API يعملان من نفس الخادم الخلفي، لذلك لا حاجة لخدمة منفصلة للـ frontend.
+- لا تعتمد على ملف [.env](backend/.env) أثناء النشر على Railway؛ أدخل القيم يدويًا في Variables داخل Railway.
+- إذا كانت القيمة تحتوي على أسطر متعددة مثل `FIREBASE_PRIVATE_KEY`، احتفظ بها بصيغة سلسلة نصية كاملة داخل Railway Variables.
 
 ## ▶️ التشغيل محليًا
 

